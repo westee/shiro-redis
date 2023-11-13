@@ -40,8 +40,8 @@ public class RedisClusterManagerTest {
         verify(jedisCluster, times(1)).set(any(byte[].class), any(byte[].class));
         verify(jedisCluster, times(0)).expire(any(byte[].class), any(int.class));
         redisClusterManager.set(new byte[0], new byte[0], 0);
-        verify(jedisCluster, times(1)).expire(any(byte[].class), any(int.class));
+        verify(jedisCluster, times(1)).expire(any(byte[].class), any(long.class));
         redisClusterManager.set(new byte[0], new byte[0], 1);
-        verify(jedisCluster, times(2)).expire(any(byte[].class), any(int.class));
+        verify(jedisCluster, times(2)).expire(any(byte[].class), any(long.class));
     }
 }

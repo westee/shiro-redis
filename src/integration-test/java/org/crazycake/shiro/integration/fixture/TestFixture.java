@@ -29,6 +29,7 @@ import static org.hamcrest.core.StringContains.containsString;
 public class TestFixture {
 
     private static Properties properties = loadProperties("shiro-standalone.ini");
+    private static String HTTP_PREFIX = "http://";
     private static Faker faker = new Faker();
 
     //  /$$       /$$                       /$$
@@ -151,7 +152,7 @@ public class TestFixture {
     }
 
     private static Jedis doGetRedisInstance() {
-        return new Jedis(properties.getProperty("redisManager.host").split(":")[0]);
+        return new Jedis(HTTP_PREFIX + properties.getProperty("redisManager.host"));
     }
 
     //                                                      /$$
