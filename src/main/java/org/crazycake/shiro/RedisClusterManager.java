@@ -134,13 +134,9 @@ public class RedisClusterManager implements IRedisManager {
 
     private Set<byte[]> getKeysFromClusterNode(ConnectionPool connectionPool, byte[] pattern) {
         Set<byte[]> keys = new HashSet<byte[]>();
-        Connection connection = connectionPool.getResource();
-
-        try {
-            Jedis jedis = new Jedis(connection);
-            ScanParams params = new ScanParams();
-            params.count(count);
-            params.match(pattern);
+        try (Connection connection = connectionPool.getResource();
+             Jedis jedis = new Jedis(connection)) {
+            ScanParams params = initScanParams(pattern);
             byte[] cursor = ScanParams.SCAN_POINTER_START_BINARY;
             ScanResult<byte[]> scanResult;
             do {
@@ -148,21 +144,23 @@ public class RedisClusterManager implements IRedisManager {
                 keys.addAll(scanResult.getResult());
                 cursor = scanResult.getCursorAsBytes();
             } while (scanResult.getCursor().compareTo(ScanParams.SCAN_POINTER_START) > 0);
-        } finally {
-            connection.close();
         }
         return keys;
     }
 
+    ScanParams initScanParams(byte[] pattern) {
+        ScanParams params = new ScanParams();
+        params.count(count);
+        params.match(pattern);
+        return params;
+    }
+
     private long getDbSizeFromClusterNode(ConnectionPool connectionPool, byte[] pattern) {
         long dbSize = 0L;
-        Connection connection = connectionPool.getResource();
 
-        try {
-            Jedis jedis = new Jedis(connection);
-            ScanParams params = new ScanParams();
-            params.count(count);
-            params.match(pattern);
+        try(Connection connection = connectionPool.getResource();
+            Jedis jedis = new Jedis(connection)) {
+            ScanParams params = initScanParams(pattern);
             byte[] cursor = ScanParams.SCAN_POINTER_START_BINARY;
             ScanResult<byte[]> scanResult;
             do {
@@ -170,8 +168,6 @@ public class RedisClusterManager implements IRedisManager {
                 dbSize++;
                 cursor = scanResult.getCursorAsBytes();
             } while (scanResult.getCursor().compareTo(ScanParams.SCAN_POINTER_START) > 0);
-        } finally {
-            connection.close();
         }
         return dbSize;
     }
