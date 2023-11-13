@@ -28,6 +28,7 @@
 -->
 
 <module name="Checker">
+    <property name="localeLanguage" value="en"/>
     <module name="Translation"/>
     <module name="FileLength"/>
     <module name="TreeWalker">
