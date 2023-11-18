@@ -158,8 +158,8 @@ public class RedisClusterManager implements IRedisManager {
     private long getDbSizeFromClusterNode(ConnectionPool connectionPool, byte[] pattern) {
         long dbSize = 0L;
 
-        try(Connection connection = connectionPool.getResource();
-            Jedis jedis = new Jedis(connection)) {
+        try (Connection connection = connectionPool.getResource();
+             Jedis jedis = new Jedis(connection)) {
             ScanParams params = initScanParams(pattern);
             byte[] cursor = ScanParams.SCAN_POINTER_START_BINARY;
             ScanResult<byte[]> scanResult;
