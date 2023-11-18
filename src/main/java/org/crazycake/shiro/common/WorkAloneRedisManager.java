@@ -51,11 +51,8 @@ public abstract class WorkAloneRedisManager implements IRedisManager {
             return null;
         }
         byte[] value;
-        Jedis jedis = getJedis();
-        try {
+        try (Jedis jedis = getJedis()) {
             value = jedis.get(key);
-        } finally {
-            jedis.close();
         }
         return value;
     }
@@ -72,15 +69,12 @@ public abstract class WorkAloneRedisManager implements IRedisManager {
         if (key == null) {
             return null;
         }
-        Jedis jedis = getJedis();
-        try {
+        try (Jedis jedis = getJedis()) {
             jedis.set(key, value);
             // -1 and 0 is not a valid expire time in Jedis
             if (expireTime > 0) {
                 jedis.expire(key, expireTime);
             }
-         } finally {
-            jedis.close();
         }
         return value;
     }
@@ -94,11 +88,8 @@ public abstract class WorkAloneRedisManager implements IRedisManager {
         if (key == null) {
             return;
         }
-        Jedis jedis = getJedis();
-        try {
+        try (Jedis jedis = getJedis()) {
             jedis.del(key);
-        } finally {
-            jedis.close();
         }
     }
 
@@ -110,8 +101,7 @@ public abstract class WorkAloneRedisManager implements IRedisManager {
     @Override
     public Long dbSize(byte[] pattern) {
         long dbSize = 0L;
-        Jedis jedis = getJedis();
-        try {
+        try (Jedis jedis = getJedis()) {
             ScanParams params = new ScanParams();
             params.count(count);
             params.match(pattern);
@@ -125,8 +115,6 @@ public abstract class WorkAloneRedisManager implements IRedisManager {
                 }
                 cursor = scanResult.getCursorAsBytes();
             } while (scanResult.getCursor().compareTo(ScanParams.SCAN_POINTER_START) > 0);
-        } finally {
-            jedis.close();
         }
         return dbSize;
     }
@@ -138,9 +126,8 @@ public abstract class WorkAloneRedisManager implements IRedisManager {
      */
     public Set<byte[]> keys(byte[] pattern) {
         Set<byte[]> keys = new HashSet<byte[]>();
-        Jedis jedis = getJedis();
 
-        try {
+        try (Jedis jedis = getJedis()) {
             ScanParams params = new ScanParams();
             params.count(count);
             params.match(pattern);
@@ -151,8 +138,6 @@ public abstract class WorkAloneRedisManager implements IRedisManager {
                 keys.addAll(scanResult.getResult());
                 cursor = scanResult.getCursorAsBytes();
             } while (scanResult.getCursor().compareTo(ScanParams.SCAN_POINTER_START) > 0);
-        } finally {
-            jedis.close();
         }
         return keys;
 
